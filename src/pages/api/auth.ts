@@ -1,6 +1,8 @@
-import { prisma } from '@/prisma/config';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
+
+import { prisma } from '@/prisma/config';
+import { User } from '@/prisma/validate';
 
 // NextJS 13 by default true, so you can directly use body
 // export const config = {
@@ -11,69 +13,86 @@ import bcrypt from 'bcrypt';
 // };
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
+  // check if method not POST
   if (req.method !== 'POST') {
     res.status(405).json({ message: 'Method not allowed!' });
   }
 
   if (req.method === 'POST') {
-    // if (!req.body.username && !req.body.password) {
-    //   return res.status(401).json({ message: 'Username/ Password kosong!' });
-    // }
-
+    // LOGIN
     if (req.headers.type === 'LOGIN') {
+      // validate request
+      if (!req.body.username && !req.body.password) {
+        return res.status(401).json({ message: 'Username/ Password kosong!' });
+      }
+
       try {
+        // find database with username and password
         const user = await prisma.user.findFirstOrThrow({
           where: {
             username: req.body.username,
             password: req.body.password,
           },
+          select: {
+            username: true,
+            password: true,
+          },
         });
 
-        const data = {
-          username: user.username,
-          role: user.role,
-          nama: user.nama,
-          uid: user.uid,
-        };
-
-        res.status(200).json({ message: 'Berhasil Login', data });
+        // success Login
+        res.status(200).json({ message: 'Berhasil Login', user });
       } catch (err) {
+        // failed Login
         res.status(401).json({ message: 'Username/ Password salah!' });
       } finally {
         prisma.$disconnect();
       }
-    } else {
+    }
+
+    // REGISTER
+    if (req.headers.type === 'REGISTER') {
       try {
-        let user = await prisma.user.findFirst({
-          where: {
-            username: req.body.username,
-          },
+        // find wiht username
+        let username = await prisma.user.findFirst({
+          where: { username: req.body.username },
+          select: { username: true },
         });
 
-        if (user) {
+        // if username exist
+        if (username) {
           return res.status(409).json({ message: 'Username sudah terdaftar' });
         }
 
-        const password = await bcrypt.hash(req.body.password, 5);
-        const uid = (Math.random() + 1).toString(30).substring(2);
+        // now validate req.body
+        User.parseAsync(req.body)
+          .then(
+            // success validate
+            async validated => {
+              // insert into DB
+              await prisma.user.create({
+                data: {
+                  ...validated,
+                  password: bcrypt.hashSync(validated.password, 10),
+                  uid: (Math.random() + 1).toString(30).substring(2),
+                },
+              });
 
-        await prisma.user.create({
-          data: {
-            nama: req.body.nama,
-            alamat: req.body.alamat,
-            nomor_telepon: req.body.nomor_telepon,
-            username: req.body.username,
-            password,
-            uid,
-          },
-        });
+              // send success message
+              res.status(200).json({ message: 'Sukses registrasi' });
+            }
+          )
+          // error validate
+          .catch(err => {
+            console.log(err);
+            res.status(400).json({ message: 'Harap lengkapi form' });
+          });
       } catch (err) {
+        // unpredicted error
         console.log(err);
+        res.status(500);
       } finally {
         prisma.$disconnect();
       }
-
-      res.status(200).json({ message: 'Test' });
     }
   }
 }

@@ -17,5 +17,9 @@ Content-Type: application/json
 Type: REGISTER
 
 {
-  "username": ""
+  "username": "joy",
+  "nama": "Joya Wondra",
+  "password": "rahasia",
+  "alamat": "St. Fushi R 24 ",
+  "nomor_telepon": "+32474756756"
 }

@@ -5,6 +5,7 @@ export default function register() {
     <div>
       <div>
         <h1 className="text-center text-5xl">Register</h1>
+        <head>Hello World</head>
       </div>
     </div>
   );

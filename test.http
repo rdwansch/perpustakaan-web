@@ -1,6 +1,6 @@
 @baseURL = http://localhost:3000
 
-# # Test LOGIN 
+# Test LOGIN 
 # POST  {{ baseURL }}/api/auth
 # Accept: application/json
 # Content-Type: application/json
@@ -11,15 +11,60 @@
 #   "password": "rahasia"
 # }
 
-POST {{ baseURL }}/api/auth 
+# GET {{ baseUrl }}/api/databuku
+
+# Test REGISTER
+# POST {{ baseURL }}/api/auth 
+# Accept: application/json
+# Content-Type: application/json
+# Type: REGISTER
+
+# {
+#   "nama": "Eko",
+#   "username": "test",
+#   "password": "rahasia",
+#   "nomor_telepon": "+32474756756",
+#   "alamat": "Jl. Setia Budi"
+# }
+
+# Test Get DataBuku 
+# GET {{ baseURL }}/api/databuku?judul=Neo
+
+# Test Insert DataBuku
+# POST {{ baseURL }}/api/databuku 
+# Accept: application/json
+# Content-Type: application/json
+
+# {
+#   "judul": "The Dark Personality",
+#   "tahun": 2018,
+#   "penerbit": "Shoi",
+#   "kategori": "Psychology",
+#   "jumlah": 20,
+#   "kode": "PS/2018/400"
+# }
+
+
+# Test EDIT DataBuku
+# PUT {{ baseURL }}/api/databuku
+# Accept: application/json
+# Content-Type: application/json
+
+# {
+#   "id": 26,
+#   "judul": "Neo Vol 2.0",
+#   "tahun": 2029,
+#   "penerbit": "MedMedia",
+#   "kategori": "Novel",
+#   "jumlah": 0,
+#   "kode": "NV/FD/3"
+# }
+
+
+DELETE  http://localhost:3000/api/databuku
 Accept: application/json
 Content-Type: application/json
-Type: REGISTER
 
 {
-  "username": "joy",
-  "nama": "Joya Wondra",
-  "password": "rahasia",
-  "alamat": "St. Fushi R 24 ",
-  "nomor_telepon": "+32474756756"
+  "id": 26
 }

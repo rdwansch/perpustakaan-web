@@ -18,7 +18,7 @@ model buku {
   tahun        Int
   penerbit     String         @db.VarChar(100)
   kategori     String         @db.VarChar(100)
-  jumlah       String         @db.VarChar(5)
+  jumlah       Int
   kode         String         @unique(map: "kode") @db.VarChar(25)
   peminjaman   peminjaman[]
   pengembalian pengembalian[]

@@ -2,7 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
 
 import { prisma } from '@/prisma/config';
-import { User } from '@/prisma/validate';
+import { UserValidate } from '@/prisma/validate';
+import { ZodError } from 'zod';
 
 // NextJS 13 by default true, so you can directly use body
 // export const config = {
@@ -63,33 +64,39 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           return res.status(409).json({ message: 'Username sudah terdaftar' });
         }
 
-        // now validate req.body
-        User.parseAsync(req.body)
-          .then(
-            // success validate
-            async validated => {
-              // insert into DB
-              await prisma.user.create({
-                data: {
-                  ...validated,
-                  password: bcrypt.hashSync(validated.password, 10),
-                  uid: (Math.random() + 1).toString(30).substring(2),
-                },
-              });
+        // manually validate using then because
+        // we wan't to catch error on validate and send to user
 
-              // send success message
-              res.status(200).json({ message: 'Sukses registrasi' });
-            }
-          )
-          // error validate
-          .catch(err => {
-            console.log(err);
-            res.status(400).json({ message: 'Harap lengkapi form' });
-          });
+        // now validate req.body
+        return (
+          UserValidate.parseAsync(req.body)
+            .then(
+              // success validate
+              validated =>
+                // insert into DB
+                prisma.user
+                  .create({
+                    data: {
+                      ...validated,
+                      password: bcrypt.hashSync(validated.password, 10),
+                      uid: (Math.random() + 1).toString(30).substring(2),
+                    },
+                    select: {
+                      nama: true,
+                      username: true,
+                      role: true,
+                    },
+                  })
+                  // send success message
+                  .then(user => res.status(200).json({ message: 'Sukses registrasi', data: user }))
+            )
+            // error validate
+            .catch((err: ZodError) => res.status(400).json({ message: 'Gagal melakukan registrasi', error: err.issues }))
+        );
       } catch (err) {
         // unpredicted error
         console.log(err);
-        res.status(500);
+        return res.status(500).end('Internal Server Error');
       } finally {
         prisma.$disconnect();
       }

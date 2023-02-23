@@ -41,10 +41,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         });
 
         // success Login
-        res.status(200).json({ message: 'Berhasil Login', user });
+        return res.status(200).json({ message: 'Berhasil Login', user });
       } catch (err) {
         // failed Login
-        res.status(401).json({ message: 'Username/ Password salah!' });
+        return res.status(401).json({ message: 'Username/ Password salah!' });
       } finally {
         prisma.$disconnect();
       }

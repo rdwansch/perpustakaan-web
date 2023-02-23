@@ -28,7 +28,7 @@
 # }
 
 # Test Get DataBuku 
-# GET {{ baseURL }}/api/databuku?judul=Neo
+GET {{ baseURL }}/api/databuku?judul=Neo
 
 # Test Insert DataBuku
 # POST {{ baseURL }}/api/databuku 
@@ -61,10 +61,10 @@
 # }
 
 
-DELETE  http://localhost:3000/api/databuku
-Accept: application/json
-Content-Type: application/json
+# DELETE  http://localhost:3000/api/databuku
+# Accept: application/json
+# Content-Type: application/json
 
-{
-  "id": 26
-}
+# {
+#   "id": 26
+# }

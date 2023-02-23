@@ -59,14 +59,12 @@ model pengembalian {
 model user {
   id            Int            @id @default(autoincrement())
   nama          String         @db.VarChar(100)
-  username      String         @db.VarChar(16)
+  username      String         @unique @db.VarChar(16)
   password      String         @db.VarChar(255)
   alamat        String         @db.VarChar(255)
   nomor_telepon String         @db.VarChar(255)
   role          String         @default("member") @db.VarChar(255)
-  uid           String         @db.VarChar(255)
+  uid           String         @unique @db.VarChar(255)
   peminjaman    peminjaman[]
   pengembalian  pengembalian[]
-
-  @@unique([username, uid])
 }

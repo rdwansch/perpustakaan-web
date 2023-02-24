@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.basic-input {
+  @apply mt-1 w-full rounded-md bg-white text-sm text-gray-700 shadow-sm focus:border-none focus:ring focus:ring-[#ffaadd];
+}
+
+.bg-primary {
+  @apply bg-[#e7008a];
+}

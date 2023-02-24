@@ -1,73 +1,62 @@
+import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
 
 export default function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleSubmit = async e => {
-    e.preventDefault();
-
-    if (username.length < 3 && password.length < 3) {
-      alert('Username/ Password min 4 karakter');
-      return;
-    }
-
-    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/auth`, {
-      method: 'POST',
-      headers: {
-        type: 'LOGIN',
-      },
-      body: {
-        username: username,
-        password: password,
-      },
-    });
-    const data = await response.json();
-    console.log(data);
-  };
-
   return (
-    <div className="flex justify-center items-center h-[100vh]">
-      <div className="bg-violet-900 w-[400px] h-[400px] rounded-lg p-5">
-        <form onSubmit={handleSubmit}>
-          <h1 className="text-center text-white text-4xl my-[50px]">Perpustakaan</h1>
-          <div className="flex flex-col gap-5">
-            <input
-              type="text"
-              className="px-5 py-2 rounded"
-              placeholder="username"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-            />
-            <input
-              type="password"
-              className="px-5 py-2 rounded"
-              placeholder="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-            />
+    <>
+      <Head>
+        <title>Login</title>
+      </Head>
 
-            <button type="submit" className="px-5 py-2 bg-violet-200 w-1/3 block mx-auto rounded hover:bg-violet-400">
-              Masuk
-            </button>
+      <section className="bg-white">
+        <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
+          <section className="flex items-center justify-center lg:col-span-5 lg:h-full xl:col-span-6">
+            <h1 className="text-4xl font-bold">Perpustakaan Snapan</h1>
+          </section>
+          <main
+            aria-label="Main"
+            className="flex items-center justify-center  px-8 py-8 sm:px-12 lg:col-span-7 lg:py-12 lg:px-16 xl:col-span-6"
+          >
+            <div className="w-8/12 max-w-xl lg:max-w-3xl">
+              <form action="#" className="mt-8">
+                <div className="mb-5">
+                  <label htmlFor="username" className="block font-medium text-gray-700">
+                    Username
+                  </label>
+                  <input type="text" id="username" className="basic-input border-gray-200" />
+                </div>
+                <div className="mb-5">
+                  <label htmlFor="passwd" className="block font-medium text-gray-700">
+                    Password
+                  </label>
+                  <input type="password" id="passwd" className="basic-input border-gray-200" />
+                </div>
+                <div className="mb-5">
+                  <label htmlFor="passwd_confirm" className="block font-medium text-gray-700">
+                    Konfirmasi Password
+                  </label>
+                  <input type="password" id="passwd_confirm" className="basic-input border-gray-200" />
+                </div>
 
-            <p className="text-gray-200">
-              Belum punya akun ?{' '}
-              <Link
-                href="/auth/register"
-                className={
-                  'hover:text-white relative after:transition-[width] ' +
-                  'after:absolute after:content[""] after:left-0 after:right-0 after:w-0 after:bottom-0 after:h-0.5 after:bg-white  ' +
-                  'after:hover:w-14'
-                }
-              >
-                Register
-              </Link>
-            </p>
-          </div>
-        </form>
-      </div>
-    </div>
+                <button className="inline-block shrink-0 rounded-md border border-primary bg-primary px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-primary focus:bg-[#ffffff] focus:text-primary focus:outline-none focus:ring focus:ring-[#ffaadd]">
+                  Buat Akun
+                </button>
+                <p className="mt-4 text-sm text-gray-500 sm:mt-0">
+                  Belum punya akun? &nbsp;
+                  <Link
+                    href="/auth/register"
+                    className="relative text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:w-0 after:rounded-full after:bg-gradient-to-r after:from-primary after:to-[#ff44b4] after:transition-[width] after:content-[''] after:hover:w-16"
+                  >
+                    Regristasi
+                  </Link>
+                  .
+                </p>
+              </form>
+            </div>
+          </main>
+        </div>
+      </section>
+    </>
   );
 }

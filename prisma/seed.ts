@@ -15,7 +15,7 @@ async function main() {
     ]);
   } catch (err) {
     console.log(`+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +`);
-    console.log(`Seeding ${err}`);
+    console.log(`Seeding ${err}`); // - - - - - - - - - - - - - - - - - - - - - - - - - - -  +
     console.log(`+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +`);
   } finally {
     prisma.$disconnect();

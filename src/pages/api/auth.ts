@@ -13,6 +13,14 @@ import { ZodError } from 'zod';
 //   },
 // };
 
+interface requestPost {
+  nama: string;
+  username: string;
+  nomor_telepon: string;
+  alamat: string;
+  password: string;
+}
+
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   // check if method not POST
   if (req.method !== 'POST') {
@@ -22,29 +30,32 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     // LOGIN
     if (req.headers.type === 'LOGIN') {
+      const { username, password } = JSON.parse(req.body);
+
       // validate request
-      if (!req.body.username && !req.body.password) {
+      if (!username && !password) {
         return res.status(401).json({ message: 'Username/ Password kosong!' });
       }
 
       try {
         // find database with username and password
         const user = await prisma.user.findFirstOrThrow({
-          where: {
-            username: req.body.username,
-            password: req.body.password,
-          },
+          where: { username },
           select: {
             username: true,
             password: true,
           },
         });
 
-        // success Login
-        return res.status(200).json({ message: 'Berhasil Login', user });
+        const match = await bcrypt.compare(password, user.password);
+
+        if (match) {
+          // success Login
+          return res.status(200).json({ message: 'Berhasil Login', data: user });
+        }
       } catch (err) {
         // failed Login
-        return res.status(401).json({ message: 'Username/ Password salah!' });
+        return res.status(401).json({ message: 'Username/ Password tidak sesuai!' });
       } finally {
         prisma.$disconnect();
       }
@@ -52,24 +63,37 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
     // REGISTER
     if (req.headers.type === 'REGISTER') {
+      const requestPost: requestPost = JSON.parse(req.body);
+
+      if (
+        requestPost.username == '' ||
+        requestPost.nama == '' ||
+        requestPost.nomor_telepon == '' ||
+        requestPost.alamat == '' ||
+        requestPost.password == ''
+      ) {
+        console.log('NOO');
+        return res.status(400).json({ message: 'Formulir tidak boleh kosong' });
+      }
+
       try {
         // find wiht username
-        let username = await prisma.user.findFirst({
-          where: { username: req.body.username },
+        let user = await prisma.user.findFirst({
+          where: { username: requestPost.username },
           select: { username: true },
         });
 
         // if username exist
-        if (username) {
+        if (user) {
           return res.status(409).json({ message: 'Username sudah terdaftar' });
         }
 
-        // manually validate using then because
+        // manually validate using "then" method because
         // we wan't to catch error on validate and send to user
 
         // now validate req.body
         return (
-          UserValidate.parseAsync(req.body)
+          UserValidate.parseAsync(requestPost)
             .then(
               // success validate
               validated =>

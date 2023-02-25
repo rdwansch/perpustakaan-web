@@ -1,15 +1,19 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { FormEvent, useEffect, useState } from 'react';
 
 export default function Login() {
   const [nama, setNama] = useState('');
   const [username, setUsername] = useState('');
-  const [noTelp, setNoTelp] = useState('');
+  const [nomor_telepon, setNoTelp] = useState('');
   const [alamat, setAlamat] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isWrongPassword, setIsWrongPassword] = useState(false);
+  const [registerAlert, setRegisterAlert] = useState('');
+
+  const router = useRouter();
 
   useEffect(() => {
     if (password !== confirmPassword) {
@@ -19,8 +23,30 @@ export default function Login() {
     setIsWrongPassword(false);
   }, [password, confirmPassword]);
 
-  const handleSubmit = e => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    fetch('/api/auth', {
+      method: 'POST',
+      headers: {
+        type: 'REGISTER',
+      },
+      body: JSON.stringify({
+        nama,
+        username,
+        nomor_telepon,
+        alamat,
+        password,
+      }),
+    }).then(async response => {
+      if (!response.ok) {
+        const { message } = await response.json();
+        return setRegisterAlert(message);
+      }
+
+      // redirect
+      router.push('/');
+    });
   };
 
   return (
@@ -37,10 +63,11 @@ export default function Login() {
         />
       </svg>
 
-      <div className="mx-auto -mt-52 max-w-xl  rounded-lg border border-[#ff56bb] px-5 py-10">
+      <div className="mx-auto -mt-52 max-w-xl rounded-lg border border-[#ff56bb] px-5 py-10">
         <h1 className="text-center text-2xl font-bold tracking-wide">Regristasi Akun </h1>
         <br />
         <hr />
+        <div className="col-span-12 text-center text-red-500">{registerAlert}</div>
         <form onSubmit={handleSubmit} className="mt-8 grid grid-cols-6 gap-6">
           <div className="col-span-6 sm:col-span-3">
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -74,7 +101,7 @@ export default function Login() {
               type="tel"
               id="phone"
               className="basic-input border-gray-200"
-              value={noTelp}
+              value={nomor_telepon}
               onChange={e => {
                 const val = e.target.value;
                 if (val == '') {

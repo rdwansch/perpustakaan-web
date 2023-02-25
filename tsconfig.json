@@ -18,6 +18,6 @@
       "@/*": ["./src/*", "./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "prisma/seed.ts", "src/pages/auth/login.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "prisma/seed.ts", "src/pages/auth/login.ts"],
   "exclude": ["node_modules"]
 }

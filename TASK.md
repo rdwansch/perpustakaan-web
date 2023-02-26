@@ -16,6 +16,18 @@
 24 Feb 2023
 Login & Register UI
 
-Target
+25 Feb 2023
 
-> Login & Register Functional
+- Login & Register Functional
+
+Target 26 Feb
+
+> Middleware
+
+Task:
+
+- Dashboard Pustakawan
+- Dashboard User
+- DataBuku
+- CRUD Pustakawan
+- Peminjaman & Pengembalian user

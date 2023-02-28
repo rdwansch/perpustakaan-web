@@ -5,14 +5,16 @@ const prisma = new PrismaClient();
 
 async function main() {
   try {
+    console.log('------------ Seeding  ------------');
     await Promise.all([
       prisma.user.createMany({
         data: [...createUser(10)],
       }),
       prisma.buku.createMany({
-        data: [...createBuku(10)],
+        data: [...createBuku(100)],
       }),
     ]);
+    console.log('------------ Finished -----------');
   } catch (err) {
     console.log(`+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +`);
     console.log(`Seeding ${err}`); // - - - - - - - - - - - - - - - - - - - - - - - - - - -  +

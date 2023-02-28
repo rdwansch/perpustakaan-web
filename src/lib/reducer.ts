@@ -5,6 +5,8 @@ export const userReducer = (state: InitialState, action: { type: 'LOGIN' | 'LOGO
     case 'LOGIN':
       return { ...state, ...action.payload };
 
+    case 'LOGOUT':
+      return 'LOGOUT';
     default:
       return state;
   }

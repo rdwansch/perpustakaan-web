@@ -1,15 +1,15 @@
 @baseURL = http://localhost:3000
 
 # Test LOGIN 
-# POST  {{ baseURL }}/api/auth
-# Accept: application/json
-# Content-Type: application/json
-# Type: LOGIN
+POST  {{ baseURL }}/api/auth
+Accept: application/json
+Content-Type: application/json
+Type: LOGIN
 
-# {
-#   "username": "ujklm23",
-#   "password": "rahasia"
-# }
+{
+  "username": "ujklm23",
+  "password": "rahasia"
+}
 
 # GET {{ baseUrl }}/api/databuku
 
@@ -28,7 +28,7 @@
 # }
 
 # Test Get DataBuku 
-GET {{ baseURL }}/api/databuku?judul=Neo
+# GET {{ baseURL }}/api/databuku?judul=Neo
 
 # Test Insert DataBuku
 # POST {{ baseURL }}/api/databuku 

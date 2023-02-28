@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 import { prisma } from '@/prisma/config';
 import { UserValidate } from '@/prisma/validate';
@@ -44,6 +45,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           select: {
             username: true,
             password: true,
+            nama: true,
+            role: true,
           },
         });
 
@@ -51,10 +54,23 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
         if (match) {
           // success Login
-          return res.status(200).json({ message: 'Berhasil Login', data: user });
+
+          // Generate JWT and send to client
+          const token = jwt.sign(
+            {
+              username: user.username,
+              nama: user.nama,
+              role: user.role,
+            },
+            process.env.PRIVATE_KEY + '',
+            { algorithm: 'HS256' }
+          );
+
+          return res.status(200).json({ message: 'Berhasil Login', data: { ...user, password: '***' }, token });
         }
       } catch (err) {
         // failed Login
+        console.log(err);
         return res.status(401).json({ message: 'Username/ Password tidak sesuai!' });
       } finally {
         prisma.$disconnect();
@@ -72,7 +88,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         requestPost.alamat == '' ||
         requestPost.password == ''
       ) {
-        console.log('NOO');
         return res.status(400).json({ message: 'Formulir tidak boleh kosong' });
       }
 
@@ -125,5 +140,25 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         prisma.$disconnect();
       }
     }
+
+    if (req.headers.type === 'VERIFY') {
+      try {
+        const JwtPayload = {
+          nama: '',
+          username: '',
+          role: '',
+          iat: 0,
+        };
+        // verify JWT
+        const payload = jwt.verify(req.headers.authorization + '', process.env.PRIVATE_KEY + '') as typeof JwtPayload;
+
+        return res.status(200).json({ message: 'Token valid', payload });
+      } catch (err) {
+        // console.log(err);
+        return res.status(401).json({ message: 'Invalid Token' });
+      }
+    }
+
+    return res.status(400).json({ message: 'Add type first' });
   }
 }

@@ -31,3 +31,8 @@ Task:
 - DataBuku
 - CRUD Pustakawan
 - Peminjaman & Pengembalian user
+
+Note:
+
+- Buat layout dalam component agar ketika page berubah, nav tidak berubah
+  Sehingga dapat dilakukan styling dalam Nav

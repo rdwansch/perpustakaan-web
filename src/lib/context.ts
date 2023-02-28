@@ -1,6 +1,4 @@
-import { UserValidate } from '@/prisma/validate';
 import { createContext } from 'react';
-import { userReducer } from './reducer';
 
 export interface InitialState {
   nama: string;

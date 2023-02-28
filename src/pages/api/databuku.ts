@@ -3,7 +3,28 @@ import { prisma } from '@/prisma/config';
 import { BukuValidate } from '@/prisma/validate';
 import { ZodError } from 'zod';
 
+// export const config = {
+//   api: {
+//     bodyParser: false,
+//   },
+// };
+
 export default async function (req: NextApiRequest, res: NextApiResponse) {
+  fetch('http://localhost/api/auth', {
+    method: 'POST',
+    headers: {
+      Authorization: req.headers.Authorization + '',
+      Type: 'VERIFY',
+    },
+  }).then(response => {
+    if (!response.ok) {
+      return res
+        .setHeader('Set-Cookie', 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT')
+        .writeHead(302, { location: '/auth/login' })
+        .end();
+    }
+  });
+
   // GET ALL BOOK
   if (req.method === 'GET') {
     try {
@@ -42,67 +63,17 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  if (req.method === 'POST') {
-    try {
-      return BukuValidate.parseAsync(req.body)
-        .then(validated =>
-          prisma.buku
-            .create({
-              data: validated,
-              select: {
-                judul: true,
-                penerbit: true,
-                kode: true,
-              },
-            })
-            .then(book => res.status(200).json({ message: 'Sukses menambahkan Buku!', data: book }))
-            .catch(err => res.status(409).json({ message: 'Kode sudah ada' }))
-        )
-        .catch((err: ZodError) => res.status(400).json({ message: 'Gagal menambah Buku', err: err.issues }));
-    } catch (err) {
-      // unpredicted error
-      console.log(err);
-      res.status(500).end('Internal Server Error');
-    }
-  }
-
-  if (req.method === 'PUT') {
-    try {
-      return BukuValidate.parseAsync(req.body)
-        .then(validated =>
-          prisma.buku
-            .update({
-              data: validated,
-              select: {
-                judul: true,
-                penerbit: true,
-                kode: true,
-              },
-              where: {
-                id: req.body.id,
-              },
-            })
-            .then(book => res.status(200).json({ message: 'Sukses mengedit Buku', data: book }))
-            .catch(err => res.status(409).json({ message: 'Gagal mengedit buku', error: err }))
-        )
-        .catch((err: ZodError) => res.status(400).json({ message: 'Gagal mengedit Buku', error: err.issues }));
-    } catch (err) {
-      console.log(err);
-      res.status(500).end('Internal Server Error');
-    }
-  }
-
   if (req.method === 'DELETE') {
+    const { kode } = JSON.parse(req.body);
     return prisma.buku
       .delete({
-        where: {
-          id: parseInt(req.body.id ?? 0),
-        },
+        where: { kode },
+        select: { judul: true },
       })
-      .then(() => res.status(200).json({ message: 'Sukses menghapus Buku' }))
+      .then(buku => res.status(200).json({ message: `Buku ${buku.judul} TERHAPUS` }))
       .catch(err => {
         console.log(err);
-        return res.status(409).json({ message: 'Gagal menghapus Buku, id tidak tersedia' });
+        return res.status(409).json({ message: 'Gagal menghapus Buku, kode tidak tersedia' });
       });
   }
 }

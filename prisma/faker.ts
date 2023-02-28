@@ -3,6 +3,16 @@ import bcrypt from 'bcrypt';
 
 export function createUser(n: number) {
   let users = [];
+  users.push({
+    username: 'ujklm23',
+    nama: 'Ridhwan R. Siddiq',
+    password: bcrypt.hashSync('rahasia', 10),
+    uid: 'uff-0g',
+    nomor_telepon: '+6281 2274 2892 1',
+    alamat: 'Jl. Pegangsaan Timur No. 56',
+    role: 'pustakawan',
+  });
+
   for (let i = 0; i < n; i++) {
     const firstname = faker.name.firstName();
     const lastname = () => faker.name.lastName() + `${Math.floor(Math.random() * n)}`;
@@ -29,7 +39,7 @@ export function createBuku(n: number) {
       penerbit: faker.name.fullName(),
       kategori: faker.helpers.arrayElement(['Novel', 'Science', 'Psychology', 'Comic', 'History', 'Philosophy']),
       jumlah: Math.floor(Math.random() * 20),
-      kode: `S8/${faker.helpers.arrayElement(['NV', 'SC', 'PS', 'CM', 'HTR', 'PH'])}/${Math.floor(Math.random() * 2000)}`,
+      kode: `S8/${faker.helpers.arrayElement(['NV', 'SC', 'PS', 'CM', 'HTR', 'PH'])}/${i + 2}`,
     });
   }
 

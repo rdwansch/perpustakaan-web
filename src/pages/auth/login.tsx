@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
 
 import Head from 'next/head';
@@ -16,16 +16,23 @@ import 'swiper/css/pagination';
 import { EffectCoverflow } from 'swiper';
 import { prisma } from '@/prisma/config';
 import { useRouter } from 'next/router';
+import cookie from '@/lib/cookie';
 
 interface Props {
   data: [{ cover: string; judul: string; kode: string }];
+  err?: string;
 }
 
-export default function Login({ data }: Props) {
+export default function Login({ data, err }: Props) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loginAlert, setLoginAlert] = useState('');
   const router = useRouter();
+
+  if (err) {
+    console.error('Error connection database:', err);
+    return;
+  }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -39,17 +46,27 @@ export default function Login({ data }: Props) {
         body: JSON.stringify({ username, password }),
       });
 
-      console.log(response.ok);
-
       if (!response.ok) {
         const { message } = await response.json();
         setLoginAlert(message);
         return;
       }
-      alert('sukses');
-      // router.push()
+      const data = await response.json();
+      cookie.setItem('token', data.token);
+      // console.log('Suksess');
+      router.push('/user');
     } catch (err) {}
   };
+
+  useEffect(() => {
+    const token = cookie.getItem('token');
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.role == 'pustakawan') {
+        router.push('/pustakawan');
+      }
+    }
+  }, []);
 
   return (
     <>
@@ -68,7 +85,6 @@ export default function Login({ data }: Props) {
               effect={'coverflow'}
               grabCursor={true}
               centeredSlides={false}
-              slidesPerView={'auto'}
               coverflowEffect={{
                 rotate: 50,
                 stretch: 0,
@@ -81,7 +97,7 @@ export default function Login({ data }: Props) {
             >
               {data.map(book => (
                 <SwiperSlide key={book.kode}>
-                  <img src={book.cover + ''} title={book.judul} />
+                  <img src={book.cover + ''} title={book.judul} alt={book.judul} />
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -143,23 +159,29 @@ export default function Login({ data }: Props) {
 }
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
-  const buku = await prisma.buku.findMany({
-    select: {
-      cover: true,
-      judul: true,
-      kode: true,
-    },
-    where: {
-      cover: {
-        not: null,
+  return prisma.buku
+    .findMany({
+      select: {
+        cover: true,
+        judul: true,
+        kode: true,
       },
-    },
-    take: 10,
-  });
-
-  return {
-    props: {
-      data: buku,
-    },
-  };
+      where: {
+        cover: {
+          not: null,
+        },
+      },
+      take: 10,
+    })
+    .then(buku => ({
+      props: {
+        data: buku,
+      },
+    }))
+    .catch(err => ({
+      props: {
+        data: [],
+        err: err.message,
+      },
+    }));
 };

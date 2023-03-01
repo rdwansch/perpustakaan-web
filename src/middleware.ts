@@ -11,8 +11,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   let _Next: NextResponse;
 
-  console.log(request.nextUrl.pathname);
-
   if (request.nextUrl.pathname == '/auth') {
     return NextResponse.redirect(new URL('/auth/login', request.url));
   }
@@ -31,5 +29,5 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 // Middleware hanya akan dijalankan sesuai matcher
 export const config = {
-  matcher: ['/pustakawan/:path*', '/admin/:path*', '/auth'],
+  matcher: ['/pustakawan/:path*', '/user/:path*', '/auth'],
 };

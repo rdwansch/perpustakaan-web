@@ -67,6 +67,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           );
 
           return res.status(200).json({ message: 'Berhasil Login', data: { ...user, password: '***' }, token });
+        } else {
+          return res.status(401).json({ message: 'Username/ Password tidak sesuai!' });
         }
       } catch (err) {
         // failed Login
@@ -159,6 +161,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       }
     }
 
-    return res.status(400).json({ message: 'Add type first' });
+    return res.status(400).json({ message: req.headers.type });
   }
 }

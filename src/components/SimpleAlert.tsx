@@ -15,6 +15,7 @@ export default function SimpleAlert({ heading, detail, setShowAlert, showAlert, 
         <div
           role="alert"
           className="absolute right-[64px] top-10 z-10 w-[500px] rounded-xl border border-gray-100 bg-white p-4 shadow-xl"
+          onClick={() => setShowAlert(false)}
         >
           <div className="flex items-start gap-4">
             {variant == 'SUCCESS' && (
@@ -54,8 +55,7 @@ export default function SimpleAlert({ heading, detail, setShowAlert, showAlert, 
               <strong className="block font-medium text-gray-900">{heading}</strong>
               <p className="mt-1 text-sm text-gray-700">{detail}</p>
             </div>
-            <button className="text-gray-500 transition hover:text-gray-600" onClick={() => setShowAlert(false)}>
-              <span className="sr-only">Dismiss popup</span>
+            <button className="text-gray-500 transition hover:text-gray-600">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

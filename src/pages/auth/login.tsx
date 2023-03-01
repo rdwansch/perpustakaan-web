@@ -54,17 +54,17 @@ export default function Login({ data, err }: Props) {
       const data = await response.json();
       cookie.setItem('token', data.token);
       // console.log('Suksess');
-      router.push('/user');
+      router.push('/pustakawan');
     } catch (err) {}
   };
 
   useEffect(() => {
     const token = cookie.getItem('token');
     if (token) {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      if (payload.role == 'pustakawan') {
-        router.push('/pustakawan');
-      }
+      // const payload = JSON.parse(atob(token.split('.')[1]));
+      // if (payload.role == 'pustakawan') {
+      router.push('/pustakawan');
+      // }
     }
   }, []);
 

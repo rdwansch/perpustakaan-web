@@ -10,20 +10,20 @@ import { ZodError } from 'zod';
 // };
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-  fetch('http://localhost/api/auth', {
-    method: 'POST',
-    headers: {
-      Authorization: req.headers.Authorization + '',
-      Type: 'VERIFY',
-    },
-  }).then(response => {
-    if (!response.ok) {
-      return res
-        .setHeader('Set-Cookie', 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT')
-        .writeHead(302, { location: '/auth/login' })
-        .end();
-    }
-  });
+  // fetch('http://localhost:3000/api/auth', {
+  //   method: 'POST',
+  //   headers: {
+  //     Authorization: req.headers.Authorization + '',
+  //     Type: 'VERIFY',
+  //   },
+  // }).then(response => {
+  //   if (!response.ok) {
+  //     return res
+  //       .setHeader('Set-Cookie', 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT')
+  //       .writeHead(302, { location: '/auth/login' })
+  //       .end();
+  //   }
+  // });
 
   // GET ALL BOOK
   if (req.method === 'GET') {
@@ -38,6 +38,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           kategori: true,
           kode: true,
           sinopsis: true,
+          penerbit: true,
           tahun: true,
         },
         where: {

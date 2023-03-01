@@ -2,10 +2,10 @@ import Loader from '@/components/Loader';
 import SideNav from '@/components/SideNav';
 import SimpleAlert from '@/components/SimpleAlert';
 import cookie from '@/lib/cookie';
-import { prisma } from '@/prisma/config';
-import { GetServerSideProps } from 'next';
-import { FormEvent, useEffect, useReducer, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import DataTable, { TableColumn } from 'react-data-table-component';
+import Image from 'next/image';
+import ModalInput from '@/components/ModalInput';
 
 interface Buku {
   judul: string;
@@ -31,6 +31,7 @@ export default function Databuku() {
   const [alertVariant, setAlertVariant] = useState<'SUCCESS' | 'DANGER'>('SUCCESS');
 
   const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState<'TAMBAH' | 'EDIT'>('TAMBAH');
 
   // Input form
   const [judulFrm, setJudulFrm] = useState('');
@@ -42,6 +43,18 @@ export default function Databuku() {
 
   const columns: TableColumn<Buku>[] = [
     { name: 'Judul', selector: row => row.judul },
+    {
+      name: 'cover',
+      cell: row => (
+        <Image
+          src={row.cover ?? '/cover-placeholder.png'}
+          alt={row.judul}
+          width={100}
+          height={150}
+          style={{ width: '50px', height: '70px', objectFit: 'cover' }}
+        />
+      ),
+    },
     { name: 'Kategori', selector: row => row.kategori },
     { name: 'Tahun', selector: row => row.tahun },
     { name: 'Penerbit', selector: row => row.penerbit },
@@ -53,7 +66,10 @@ export default function Databuku() {
           <button className="inline-block bg-violet-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-violet-200 focus:relative">
             Detail
           </button>
-          <button className="inline-block bg-orange-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-orange-200 focus:relative">
+          <button
+            onClick={() => handleModalInput('EDIT', row)}
+            className="inline-block bg-orange-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-orange-200 focus:relative"
+          >
             Edit
           </button>
           <button
@@ -91,8 +107,15 @@ export default function Databuku() {
     }
   };
 
-  const handleTambahForm = async (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    if (!judulFrm || !tahunFrm || !penerbitFrm || !kategoriFrm || !kodeFrm) {
+      alert('Formulir tidak boleh kosong!');
+      return;
+    }
+
+    console.log(coverFrm);
 
     const form = new FormData();
     form.append('judul', judulFrm);
@@ -103,19 +126,44 @@ export default function Databuku() {
     form.append('kode', kodeFrm);
     form.append('jumlah', '50');
 
-    const response = await fetch('/api/uploadbuku', { method: 'POST', body: form });
+    const response = await fetch('/api/uploadbuku', { method: modalType == 'TAMBAH' ? 'POST' : 'PUT', body: form });
+
+    const data = await response.json();
+
     setShowAlert(true);
 
     if (!response.ok) {
       setAlertVariant('DANGER');
-      setAlertHeading('Gagal menambah Buku');
+      setAlertHeading(`Gagal ${modalType} Buku`);
       setAlertDetail('Kode Buku sudah ada');
       return;
     }
 
     setAlertVariant('SUCCESS');
-    setAlertHeading('Berhasil Menambah Buku');
+    setAlertHeading(`Berhasil ${modalType} Buku`);
+    setAlertDetail('');
+
     setShowModal(false);
+  };
+
+  const handleModalInput = (type: typeof modalType, row: Buku) => {
+    setShowModal(true);
+    setModalType(type);
+
+    setJudulFrm('');
+    setKategoriFrm('');
+    setTahunFrm('');
+    setPenerbitFrm('');
+    setKodeFrm('');
+    setCoverFrm('');
+
+    if (type == 'EDIT') {
+      setJudulFrm(row.judul);
+      setKategoriFrm(row.kategori);
+      setTahunFrm(row.tahun);
+      setPenerbitFrm(row.penerbit);
+      setKodeFrm(row.kode);
+    }
   };
 
   useEffect(() => {
@@ -123,7 +171,7 @@ export default function Databuku() {
     fetch('/api/databuku', { headers: { Authorization: cookie.getItem('token') } })
       .then(response => response.json())
       .then(result => setData(result.data));
-  }, []);
+  }, [showModal]);
 
   return (
     <>
@@ -133,63 +181,13 @@ export default function Databuku() {
           <h1 className="text-3xl text-gray-600">Data Buku</h1>
           <button
             className="rounded-md bg-pink-100 px-5 py-2 text-primary transition hover:bg-pink-200"
-            onClick={() => setShowModal(true)}
+            onClick={() => handleModalInput('TAMBAH', dataBuku[-1])}
           >
             Tambah Buku
           </button>
         </div>
 
         {!isSSR ? <DataTable data={dataBuku} columns={columns} pagination /> : <Loader />}
-
-        {/* <table className="mt-10 w-full divide-y-2 divide-gray-200 text-sm shadow">
-          <thead>
-            <tr>
-              <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">No</th>
-              <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">Judul</th>
-              <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">Cover</th>
-              <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">Kategori</th>
-              <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">Tahun</th>
-              <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">Penerbit</th>
-              <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">Kode</th>
-              <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">Aksi</th>
-              <th className="px-4 py-2" />
-            </tr>
-          </thead>
-          <tbody className=" divide-y divide-gray-200">
-            {dataBuku &&
-              dataBuku.map((buku, idx) => (
-                <tr className="even:bg-gray-50" key={buku.kode}>
-                  <td className="whitespace-nowrap px-4 py-2 text-gray-700">{idx + 1}</td>
-                  <td className="whitespace-nowrap px-4 py-2 text-gray-700">{buku.judul}</td>
-                  <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                    <img src={buku.cover} alt={'Thumbnail'} width={50} height={20} />
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-2 text-gray-700">{buku.kategori}</td>
-                  <td className="whitespace-nowrap px-4 py-2 text-gray-700">{buku.tahun}</td>
-                  <td className="whitespace-nowrap px-4 py-2 text-gray-700">{buku.penerbit}</td>
-                  <td className="whitespace-nowrap px-4 py-2 text-gray-700">{buku.kode}</td>
-                  <td className="whitespace-nowrap px-4 py-2">
-                    <span className="inline-flex -space-x-px overflow-hidden rounded-md border bg-white shadow-sm">
-                      <button className="inline-block bg-violet-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-violet-200 focus:relative">
-                        Detail
-                      </button>
-                      <button className="inline-block bg-orange-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-orange-200 focus:relative">
-                        Edit
-                      </button>
-                      <button
-                        className="inline-block bg-red-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-red-200 focus:relative"
-                        onClick={() =>
-                          confirm(`Buku ${buku.judul}-${buku.tahun} akan terhapus`) && handleBtnAction('DELETE', buku.kode)
-                        }
-                      >
-                        Hapus
-                      </button>
-                    </span>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table> */}
       </div>
       <SimpleAlert
         variant={alertVariant}
@@ -198,6 +196,7 @@ export default function Databuku() {
         showAlert={showAlert}
         setShowAlert={setShowAlert}
       />
+
       {showModal && (
         <>
           <div
@@ -206,7 +205,7 @@ export default function Databuku() {
           ></div>
           <div className="absolute top-0 left-0 right-0 z-10 mx-auto w-[700px] py-12">
             <div role="alert" className="container mx-auto w-11/12 max-w-full">
-              <form onSubmit={handleTambahForm}>
+              <form onSubmit={handleSubmit}>
                 <div className="relative rounded-lg border border-gray-400 bg-white py-8 px-5 shadow-md md:px-10">
                   <div className="mb-3 flex w-full justify-start text-gray-600">
                     <svg
@@ -226,29 +225,32 @@ export default function Databuku() {
                       <path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" />
                     </svg>
                   </div>
-                  <h1 className="font-lg mb-4 font-bold leading-tight tracking-normal text-gray-800">Tambah Data Buku</h1>
+                  <h1 className="font-lg mb-4 font-bold leading-tight tracking-normal text-gray-800">
+                    {modalType == 'TAMBAH' && 'Tambah Data Buku'}
+                    {modalType == 'EDIT' && 'Edit Data Buku'}
+                  </h1>
                   <label htmlFor="name" className="text-sm font-bold leading-tight tracking-normal text-gray-800">
                     Judul
                   </label>
                   <input
                     className="mb-5 mt-2 flex h-10 w-full items-center rounded border border-gray-300 pl-3 text-sm font-normal text-gray-600 focus:border focus:border-pink-700 focus:outline-none"
-                    placeholder="The book"
                     onChange={e => setJudulFrm(e.target.value)}
+                    value={judulFrm}
                   />
                   <label htmlFor="name" className="text-sm font-bold leading-tight tracking-normal text-gray-800">
                     Kategori
                   </label>
                   <input
                     className="mb-5 mt-2 flex h-10 w-full items-center rounded border border-gray-300 pl-3 text-sm font-normal text-gray-600 focus:border focus:border-pink-700 focus:outline-none"
-                    placeholder="Novel"
                     onChange={e => setKategoriFrm(e.target.value)}
+                    value={kategoriFrm}
                   />
                   <label htmlFor="name" className="text-sm font-bold leading-tight tracking-normal text-gray-800">
                     Tahun
                   </label>
                   <input
                     className="mb-5 mt-2 flex h-10 w-full items-center rounded border border-gray-300 pl-3 text-sm font-normal text-gray-600 focus:border focus:border-pink-700 focus:outline-none"
-                    placeholder="0000"
+                    placeholder="YYYY"
                     onChange={e => {
                       const val = e.target.value;
                       if (val == '') {
@@ -265,8 +267,8 @@ export default function Databuku() {
                   </label>
                   <input
                     className="mb-5 mt-2 flex h-10 w-full items-center rounded border border-gray-300 pl-3 text-sm font-normal text-gray-600 focus:border focus:border-pink-700 focus:outline-none"
-                    placeholder="media"
                     onChange={e => setPenerbitFrm(e.target.value)}
+                    value={penerbitFrm}
                   />
                   <label htmlFor="name" className="text-sm font-bold leading-tight tracking-normal text-gray-800">
                     Kode
@@ -274,7 +276,12 @@ export default function Databuku() {
                   <input
                     className="mb-5 mt-2 flex h-10 w-full items-center rounded border border-gray-300 pl-3 text-sm font-normal text-gray-600 focus:border focus:border-pink-700 focus:outline-none"
                     placeholder="KO/0/1"
-                    onChange={e => setKodeFrm(e.target.value)}
+                    onChange={e => {
+                      if (modalType != 'EDIT') {
+                        setKodeFrm(e.target.value);
+                      }
+                    }}
+                    value={kodeFrm}
                   />
                   <label htmlFor="name" className="text-sm font-bold leading-tight tracking-normal text-gray-800">
                     Cover
@@ -310,31 +317,3 @@ export default function Databuku() {
     </>
   );
 }
-
-// export const getServerSideProps: GetServerSideProps = async ctx => {
-//   return prisma.buku
-//     .findMany({
-//       select: {
-//         judul: true,
-//         cover: true,
-//         kode: true,
-//         kategori: true,
-//         tahun: true,
-//         penerbit: true,
-//       },
-//       orderBy: {
-//         id: 'desc',
-//       },
-//     })
-//     .then(buku => ({
-//       props: {
-//         data: buku,
-//       },
-//     }))
-//     .catch(err => ({
-//       props: {
-//         d_: [],
-//         err: err.message,
-//       },
-//     }));
-// };

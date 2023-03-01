@@ -24,12 +24,14 @@ Target 26 Feb
 
 > Middleware
 
+1 Mar:
+
+- CRUD DataBuku
+
 Task:
 
 - Dashboard Pustakawan
 - Dashboard User
-- DataBuku
-- CRUD Pustakawan
 - Peminjaman & Pengembalian user
 
 Note:

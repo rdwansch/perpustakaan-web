@@ -9,6 +9,17 @@ import { ZodError } from 'zod';
 //   },
 // };
 
+interface Books {
+  kode: string;
+  judul: string;
+  cover: string | null;
+  sinopsis: string | null;
+  tahun: number;
+  penerbit: string;
+  kategori: string;
+  jumlah: number;
+}
+
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   // fetch('http://localhost:3000/api/auth', {
   //   method: 'POST',
@@ -28,28 +39,49 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   // GET ALL BOOK
   if (req.method === 'GET') {
     try {
-      // find all order by desc or where judul contains {}
-      const books = await prisma.buku.findMany({
-        orderBy: { id: 'desc' },
-        select: {
-          judul: true,
-          cover: true,
-          jumlah: true,
-          kategori: true,
-          kode: true,
-          sinopsis: true,
-          penerbit: true,
-          tahun: true,
-        },
-        where: {
-          judul: {
-            // query is "" or "{judul}"
-            contains: req.query.judul ? `${req.query.judul}` : '',
+      let books: Array<Books> = [];
+      if (req.query?.kode) {
+        books = await prisma.buku.findMany({
+          select: {
+            judul: true,
+            cover: true,
+            jumlah: true,
+            kategori: true,
+            kode: true,
+            sinopsis: true,
+            penerbit: true,
+            tahun: true,
           },
-        },
-        take: 18,
-        skip: req.query.skip ? parseInt(`${req.query.skip}`) : 0,
-      });
+          where: {
+            kode: {
+              equals: req.query.kode ? `${req.query.kode}` : '',
+            },
+          },
+        });
+      } else {
+        // find all order by desc or where judul contains {}
+        books = await prisma.buku.findMany({
+          orderBy: { id: 'desc' },
+          select: {
+            judul: true,
+            cover: true,
+            jumlah: true,
+            kategori: true,
+            kode: true,
+            sinopsis: true,
+            penerbit: true,
+            tahun: true,
+          },
+          where: {
+            judul: {
+              contains: req.query.judul ? `${req.query.judul}` : '',
+            },
+          },
+
+          take: 18,
+          skip: req.query.skip ? parseInt(`${req.query.skip}`) : 0,
+        });
+      }
 
       if (books.length == 0) {
         return res.status(404).json({ message: 'Buku Tidak Ditemukan', data: books });

@@ -77,7 +77,7 @@ export default function Index() {
                       {buku.sinopsis || 'Buku ini sangatlah bagus'}
                     </p>
                     <Link
-                      href={`/detail/${buku.kode}`}
+                      href={`/databuku/${buku.kode.replaceAll('/', '%2f')}`}
                       className="group mt-4 inline-flex items-center gap-1 text-sm font-medium text-pink-600"
                     >
                       Lihat Detail

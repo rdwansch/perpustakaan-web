@@ -1,7 +1,21 @@
+import cookie from '@/lib/cookie';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function Navbar() {
+  const [isLogin, setIsLogin] = useState(false);
+  const [role, setRole] = useState('');
+
+  useEffect(() => {
+    const token = cookie.getItem('token');
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      setRole(payload.role);
+      setIsLogin(true);
+    }
+  }, []);
+
   return (
     <>
       <Head>
@@ -20,16 +34,18 @@ export default function Navbar() {
               <div className="sm:flex sm:gap-4">
                 <Link
                   className="block rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-white transition hover:bg-pink-600 "
-                  href="/auth/login"
+                  href={isLogin ? (role == 'pustakawan' ? '/pustakawan' : '/user') : `/auth/login`}
                 >
-                  Login
+                  {isLogin ? 'Dashboard' : 'Login'}
                 </Link>
-                <Link
-                  className="block rounded-md bg-gray-50 px-5 py-2.5 text-sm font-medium text-primary hover:bg-pink-100 hover:text-pink-700"
-                  href="/auth/register"
-                >
-                  Register
-                </Link>
+                {!isLogin && (
+                  <Link
+                    className="block rounded-md bg-gray-50 px-5 py-2.5 text-sm font-medium text-primary hover:bg-pink-100 hover:text-pink-700"
+                    href="/auth/register"
+                  >
+                    Register
+                  </Link>
+                )}
               </div>
               <button className="block rounded bg-gray-100 p-2.5 text-gray-600 transition hover:text-gray-600/75 md:hidden">
                 <span className="sr-only">Toggle menu</span>

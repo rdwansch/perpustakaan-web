@@ -152,9 +152,13 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           iat: 0,
         };
         // verify JWT
-        const payload = jwt.verify(req.headers.authorization + '', process.env.PRIVATE_KEY + '') as typeof JwtPayload;
+        // const payload = jwt.verify(req.headers?.token + '', process.env.PRIVATE_KEY + '') as typeof JwtPayload;
 
-        return res.status(200).json({ message: 'Token valid', payload });
+        if (req.cookies.token) {
+          throw new Error('E');
+        }
+
+        return res.status(200).json({ message: 'Token valid', payload: JwtPayload });
       } catch (err) {
         // console.log(err);
         return res.status(401).json({ message: 'Invalid Token' });

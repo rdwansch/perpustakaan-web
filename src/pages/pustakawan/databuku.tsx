@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import DataTable, { TableColumn } from 'react-data-table-component';
 import Image from 'next/image';
 import ModalInput from '@/components/ModalInput';
+import Head from 'next/head';
 
 interface Buku {
   judul: string;
@@ -84,7 +85,7 @@ export default function Databuku() {
     },
   ];
 
-  const handleBtnAction = async (act: 'DELETE' | 'DETAIL' | 'EDIT', kode: string) => {
+  const handleBtnAction = async (act: 'DELETE' | 'DETAIL', kode: string) => {
     switch (act) {
       case 'DELETE': {
         const response = await fetch('/api/databuku', {
@@ -175,6 +176,9 @@ export default function Databuku() {
 
   return (
     <>
+      <Head>
+        <title>Databuku | Pustakawan</title>
+      </Head>
       <SideNav />
       <div className="absolute top-0 left-80 w-[80%] pt-10 pl-10">
         <div className="flex justify-between">

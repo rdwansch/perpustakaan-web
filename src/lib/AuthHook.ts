@@ -12,7 +12,7 @@ export default async (cookies: RequestCookies) => {
         credentials: 'include',
         headers: {
           Type: 'VERIFY',
-          Authorization: token,
+          Authorization: 'Bearer ' + token,
         },
       });
       const data = await response.json();

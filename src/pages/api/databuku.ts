@@ -77,7 +77,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
               contains: req.query.judul ? `${req.query.judul}` : '',
             },
           },
-
           take: 18,
           skip: req.query.skip ? parseInt(`${req.query.skip}`) : 0,
         });

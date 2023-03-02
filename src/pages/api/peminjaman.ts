@@ -27,7 +27,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           tanggal_pinjam: true,
           id: true,
           buku: {
-            select: { judul: true },
+            select: { judul: true, cover: true },
           },
           user: {
             select: { nama: true, username: true },
@@ -53,7 +53,25 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (req.method === 'POST') {
-    console.log('HARUS USER');
+    const data = JSON.parse(req.body);
+
+    try {
+      const peminjaman = await prisma.peminjaman.create({
+        data: {
+          durasi: parseInt(data.durasi),
+          tanggal_pinjam: `${data.tanggal_pinjam}T00:00:00.000Z`,
+          jumlah_buku: 1,
+          status: 'Menunggu Konfirmasi',
+          user: { connect: { username: data.username } },
+          buku: { connect: { kode: data.kode } },
+        },
+      });
+
+      res.status(200).json({ message: 'Berhasil meminjam Buku' });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).end('Internal Server Error');
+    }
   }
 
   if (req.method === 'PUT') {

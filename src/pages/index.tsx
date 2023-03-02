@@ -67,13 +67,13 @@ export default function Index() {
         <div className="mt-10 flex flex-wrap justify-center gap-10">
           {data.length > 0
             ? data.map(buku => (
-                <div key={buku.kode} className="max-w-[250px] overflow-hidden rounded-lg border border-gray-100 shadow-sm">
+                <div key={buku.kode} className="w-[250px] overflow-hidden rounded-lg border border-gray-100 shadow-sm">
                   <img alt="Office" src={buku.cover ?? '/cover-placeholder.jpg'} className="h-56 w-full object-cover" />
                   <div className="p-4 sm:p-6">
                     <a href="#">
                       <h3 className="text-lg font-medium text-gray-900">{buku.judul}</h3>
                     </a>
-                    <p className="line-clamp-3 mt-2 text-sm leading-relaxed text-gray-500">
+                    <p className="mt-2 text-sm leading-relaxed text-gray-500 line-clamp-3">
                       {buku.sinopsis || 'Buku ini sangatlah bagus'}
                     </p>
                     <Link

@@ -45,7 +45,7 @@ export default function Kode() {
       <div className="container mx-auto mt-10">
         {data ? (
           <div className="mx-auto flex w-9/12 gap-10 rounded border p-10 shadow-lg">
-            <img src={data.cover ?? '/cover-placeholder.jpg'} alt={data.judul} />
+            <img src={data.cover ?? '/cover-placeholder.jpg'} alt={data.judul} width={250} height={400} />
             <div className="flex flex-col justify-between gap-5">
               <div>
                 {' '}

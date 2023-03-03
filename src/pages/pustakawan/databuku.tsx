@@ -15,6 +15,7 @@ interface Buku {
   kategori: string;
   tahun: string;
   penerbit: string;
+  sinopsis: string;
 }
 
 // interface Props {
@@ -41,6 +42,7 @@ export default function Databuku() {
   const [penerbitFrm, setPenerbitFrm] = useState('');
   const [kodeFrm, setKodeFrm] = useState('');
   const [coverFrm, setCoverFrm] = useState<string | Blob>('');
+  const [sinopsisFrm, setSinopsisFrm] = useState('');
 
   const columns: TableColumn<Buku>[] = [
     { name: 'Judul', selector: row => row.judul },
@@ -125,6 +127,7 @@ export default function Databuku() {
     form.append('penerbit', penerbitFrm);
     form.append('kategori', kategoriFrm);
     form.append('kode', kodeFrm);
+    form.append('sinopsis', sinopsisFrm);
     form.append('jumlah', '50');
 
     const response = await fetch('/api/uploadbuku', { method: modalType == 'TAMBAH' ? 'POST' : 'PUT', body: form });
@@ -157,6 +160,7 @@ export default function Databuku() {
     setPenerbitFrm('');
     setKodeFrm('');
     setCoverFrm('');
+    setSinopsisFrm('');
 
     if (type == 'EDIT') {
       setJudulFrm(row.judul);
@@ -164,6 +168,7 @@ export default function Databuku() {
       setTahunFrm(row.tahun);
       setPenerbitFrm(row.penerbit);
       setKodeFrm(row.kode);
+      setSinopsisFrm(row.sinopsis);
     }
   };
 
@@ -286,6 +291,14 @@ export default function Databuku() {
                       }
                     }}
                     value={kodeFrm}
+                  />
+                  <label htmlFor="name" className="text-sm font-bold leading-tight tracking-normal text-gray-800">
+                    Sinopsis
+                  </label>
+                  <input
+                    className="mb-5 mt-2 flex h-10 w-full items-center rounded border border-gray-300 pl-3 text-sm font-normal text-gray-600 focus:border focus:border-pink-700 focus:outline-none"
+                    onChange={e => setSinopsisFrm(e.target.value)}
+                    value={sinopsisFrm}
                   />
                   <label htmlFor="name" className="text-sm font-bold leading-tight tracking-normal text-gray-800">
                     Cover

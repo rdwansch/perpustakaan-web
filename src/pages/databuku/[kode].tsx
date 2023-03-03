@@ -38,6 +38,8 @@ export default function Kode() {
     }
   }, []);
 
+  console.log(data);
+
   return (
     <>
       <Navbar />
@@ -48,9 +50,18 @@ export default function Kode() {
             <img src={data.cover ?? '/cover-placeholder.jpg'} alt={data.judul} width={250} height={400} />
             <div className="flex flex-col justify-between gap-5">
               <div>
-                {' '}
                 <h1 className="text-2xl font-medium">{data.judul}</h1>
-                <p>{data.sinopsis ?? '...Descripsi Buku'}</p>
+                <p className="text-gray-600">
+                  Penerbit: <span className="font-semibold">{data.penerbit}</span>
+                </p>
+                <p className="text-gray-600">
+                  Tahun: <span className="font-semibold">{data.tahun}</span>
+                </p>
+                <p className="text-gray-600">
+                  Kategori: <span className="font-semibold">{data.kategori}</span>
+                </p>
+                <br />
+                <p className="text-gray-500">{data.sinopsis}</p>
               </div>
               <button
                 className="block w-fit rounded-lg border border-primary px-10 py-2 shadow shadow-pink-200 transition hover:bg-primary hover:text-white hover:shadow-xl"

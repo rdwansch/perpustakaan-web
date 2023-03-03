@@ -57,7 +57,7 @@ export default function Index({ databuku, pengguna, peminjam }: Props) {
 export const getServerSideProps: GetServerSideProps = async ctx => {
   const databuku = (await prisma.buku.count()) - 1;
   const pengguna = (await prisma.user.count()) - 1;
-  const peminjam = (await prisma.peminjaman.count()) - 1;
+  const peminjam = (await prisma.peminjaman.count()) + 1;
 
   return {
     props: {

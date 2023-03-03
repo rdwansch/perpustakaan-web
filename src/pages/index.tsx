@@ -33,7 +33,7 @@ export default function Index() {
     <>
       <Navbar />
 
-      <div className="container mx-auto mt-14">
+      <div className="container mx-auto mt-14 mb-10">
         <h1 className="text-center text-5xl font-normal">Perpustakaan</h1>
 
         <div className="mx-auto mt-10 max-w-md">
@@ -67,30 +67,30 @@ export default function Index() {
         <div className="mt-10 flex flex-wrap justify-center gap-10">
           {data.length > 0
             ? data.map(buku => (
-                <div key={buku.kode} className="w-[250px] overflow-hidden rounded-lg border border-gray-100 shadow-sm">
+                <div
+                  key={buku.kode}
+                  className="w-[250px] overflow-hidden rounded-lg border border-gray-100 shadow-sm hover:shadow hover:shadow-primary"
+                >
                   <img alt="Office" src={buku.cover ?? '/cover-placeholder.jpg'} className="h-56 w-full object-cover" />
                   <div className="p-4 sm:p-6">
-                    <a href="#">
+                    <Link href={`/databuku/${buku.kode.replaceAll('/', '%2f')}`}>
                       <h3 className="text-lg font-medium text-gray-900">{buku.judul}</h3>
-                    </a>
-                    <p className="mt-2 text-sm leading-relaxed text-gray-500 line-clamp-3">
-                      {buku.sinopsis || 'Buku ini sangatlah bagus'}
-                    </p>
-                    <Link
-                      href={`/databuku/${buku.kode.replaceAll('/', '%2f')}`}
-                      className="group mt-4 inline-flex items-center gap-1 text-sm font-medium text-pink-600"
-                    >
-                      Lihat Detail
-                      <span aria-hidden="true" className="block transition group-hover:translate-x-0.5">
-                        →
-                      </span>
+                      <p className="mt-2 text-sm leading-relaxed text-gray-500 line-clamp-1">
+                        {buku.sinopsis || `${buku.penerbit}`}
+                      </p>
+                      <p className="group mt-4 inline-flex items-center gap-1 text-sm font-medium text-pink-600">
+                        Lihat Detail
+                        <span aria-hidden="true" className="block transition group-hover:translate-x-0.5">
+                          →
+                        </span>
+                      </p>
                     </Link>
                   </div>
                 </div>
               ))
             : 'Tidak Ada Buku'}
         </div>
-        <div className="mx-auto mt-10 flex w-fit justify-center gap-3">
+        {/* <div className="mx-auto mt-10 flex w-fit justify-center gap-3">
           <button
             className="inline-flex h-8 w-8 items-center justify-center rounded border border-pink-100 hover:shadow hover:shadow-pink-300"
             onClick={() => setSkip(prev => prev + 18)}
@@ -117,10 +117,9 @@ export default function Index() {
               />
             </svg>
           </button>
-        </div>
+        </div> */}
       </div>
-      <br />
-      <br />
+      <p className="text-center text-gray-500">Perpustakaan ©2023</p>
       <br />
       <br />
       <br />

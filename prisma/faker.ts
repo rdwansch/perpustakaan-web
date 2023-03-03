@@ -4,13 +4,22 @@ import bcrypt from 'bcrypt';
 export function createUser(n: number) {
   let users = [];
   users.push({
-    username: 'ujklm23',
+    username: 'pustakawan',
     nama: 'Ridhwan R. Siddiq',
     password: bcrypt.hashSync('rahasia', 10),
-    uid: 'uff-0g',
+    uid: 'U-23cVb',
     nomor_telepon: '+6281 2274 2892 1',
     alamat: 'Jl. Pegangsaan Timur No. 56',
     role: 'pustakawan',
+  });
+  users.push({
+    username: 'member',
+    nama: 'Amire Nia',
+    password: bcrypt.hashSync('rahasia', 10),
+    uid: 'U-Hbg34u',
+    nomor_telepon: '+6281 2274 2892 1',
+    alamat: 'Jl. Pegangsaan Timur No. 56',
+    role: 'member',
   });
 
   for (let i = 0; i < n; i++) {

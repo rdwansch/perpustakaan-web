@@ -13,6 +13,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   if (request.nextUrl.pathname == '/auth') {
     return NextResponse.redirect(new URL('/auth/login', request.url));
+  } else if (request.nextUrl.pathname == '/user') {
+    return NextResponse.redirect(new URL('/user/peminjaman', request.url));
   }
 
   const _user = await useAuth(request.cookies);

@@ -11,7 +11,7 @@ async function main() {
         data: [...createUser(10)],
       }),
       prisma.buku.createMany({
-        data: [...createBuku(100)],
+        data: [...createBuku(10)],
       }),
     ]);
     console.log('------------ Finished -----------');

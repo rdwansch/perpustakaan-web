@@ -87,10 +87,8 @@ export default function Login({ data, err }: Props) {
       <section className="bg-white">
         <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
           <section className="relative -mt-[80px] flex flex-col items-center justify-center gap-20 lg:col-span-5 lg:h-full xl:col-span-6">
-            <div className="absolute h-[100%] w-[100%] translate-y-[150px] overflow-y-hidden bg-[url(/login_wave.svg)] bg-cover"></div>
-
             <h1 className="z-[1] text-3xl font-bold">Perpustakaan Snapan</h1>
-
+            {/* 
             <Swiper
               effect={'coverflow'}
               grabCursor={true}
@@ -110,7 +108,7 @@ export default function Login({ data, err }: Props) {
                   <img src={book.cover + ''} title={book.judul} alt={book.judul} />
                 </SwiperSlide>
               ))}
-            </Swiper>
+            </Swiper> */}
           </section>
 
           <main

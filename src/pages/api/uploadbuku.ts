@@ -19,6 +19,7 @@ interface ParsedData {
   penerbit: string;
   kategori: string;
   kode: string;
+  sinopsis: string;
 }
 
 function toFindDuplicates(arry: Array<string | undefined>) {
@@ -45,6 +46,7 @@ function parseRaw(files: any, fields: any) {
     penerbit: fields.penerbit + '',
     kategori: fields.kategori + '',
     kode: fields.kode + '',
+    sinopsis: fields.sinopsis + '',
   };
 
   return { data, newPath, rawData, oldPath: files?.cover?.filepath };

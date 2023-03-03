@@ -19,7 +19,7 @@ export default function SideNav() {
 
   return (
     <>
-      <div className="flex h-screen max-w-xs flex-col justify-between border-r shadow-md">
+      <div className="fixed flex min-h-screen !w-[300px] flex-col justify-between border-r shadow-md">
         <div className="px-4 py-6">
           <span className="grid h-10 w-32 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600">
             Perpustakaan

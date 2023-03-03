@@ -1,31 +1,17 @@
 import { prisma } from '@/prisma/config';
+import { pengembalian } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
-
-interface Peminjaman {
-  buku: {
-    judul: string;
-  };
-  user: {
-    nama: string;
-    username: string;
-  };
-  durasi: number;
-  tanggal_pinjam: Date;
-  status: string;
-  jumlah_buku: number;
-  id: number;
-}
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method == 'GET') {
     try {
-      const peminjaman = await prisma.peminjaman.findMany({
+      const pengembalian = await prisma.pengembalian.findMany({
         select: {
-          jumlah_buku: true,
-          durasi: true,
           status: true,
           tanggal_pinjam: true,
           id: true,
+          denda: true,
+          tanggal_kembali: true,
           buku: {
             select: { judul: true, cover: true, kode: true },
           },
@@ -46,7 +32,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         },
       });
 
-      return res.status(200).json({ message: 'Data Peminjaman', data: peminjaman });
+      return res.status(200).json({ message: 'Data Peminjaman', data: pengembalian });
     } catch (err) {
       console.log(err);
       return res.status(500).end('Internal Server Error');
@@ -56,19 +42,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const data = JSON.parse(req.body);
 
-    // console.log('_______________________________');
-    // console.log(data.username);
-    // console.log(data.judul);
-    // console.log(data.kode);
-    // console.log(data.status ?? 'Menunggu Konfirmasi');
-    // console.log('-------------------------------');
-
     try {
-      const peminjaman = await prisma.peminjaman.create({
+      const pengembalian = await prisma.pengembalian.create({
         data: {
-          durasi: parseInt(data.durasi),
-          tanggal_pinjam: `${data.tanggal_pinjam}T00:00:00.000Z`,
-          jumlah_buku: 1,
+          denda: 0,
+          tanggal_pinjam: `${data.tanggal_pinjam}`,
           status: 'Menunggu Konfirmasi',
           user: { connect: { username: data.username } },
           buku: { connect: { kode: data.kode } },
@@ -83,12 +61,13 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (req.method === 'PUT') {
-    const data: Peminjaman = JSON.parse(req.body);
+    const data: pengembalian = JSON.parse(req.body);
 
     try {
-      const peminjaman = await prisma.peminjaman.update({
+      const pengembalian = await prisma.pengembalian.update({
         data: {
           status: data.status,
+          denda: parseInt(data.denda + '' ?? 0),
         },
         where: {
           id: data.id,
@@ -106,7 +85,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     const { id } = JSON.parse(req.body);
 
     try {
-      const peminjaman = await prisma.peminjaman.delete({
+      const pengembalian = await prisma.pengembalian.delete({
         where: { id },
       });
 

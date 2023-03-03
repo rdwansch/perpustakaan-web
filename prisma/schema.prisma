@@ -42,15 +42,15 @@ model peminjaman {
 }
 
 model pengembalian {
-  id              Int      @id @default(autoincrement())
+  id              Int       @id @default(autoincrement())
   id_buku         Int
   id_user         Int
-  tanggal_kembali DateTime @default(now()) @db.Date
-  tanggal_pinjam  DateTime @db.Date
+  tanggal_kembali DateTime? @default(now()) @db.Date
+  tanggal_pinjam  DateTime  @db.Date
   denda           Int?
-  status          String   @db.VarChar(255)
-  user            user     @relation(fields: [id_user], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "pengembalian_ibfk_1")
-  buku            buku     @relation(fields: [id_buku], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "pengembalian_ibfk_2")
+  status          String    @db.VarChar(255)
+  user            user      @relation(fields: [id_user], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "pengembalian_ibfk_1")
+  buku            buku      @relation(fields: [id_buku], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "pengembalian_ibfk_2")
 
   @@index([id_buku], map: "id_buku")
   @@index([id_user], map: "id_user")

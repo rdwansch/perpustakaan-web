@@ -57,12 +57,12 @@ export default function Kode() {
                 onClick={() => {
                   if (isLogin) {
                     role == 'pustakawan'
-                      ? router.push('/pustakawan')
+                      ? router.push('/')
                       : router.push({ pathname: '/user/peminjaman', query: `kode=${data.kode}` });
                   }
                 }}
               >
-                Pinjam
+                {role == 'pustakawan' ? 'Kembali' : 'Pinjam'}
               </button>
             </div>
           </div>

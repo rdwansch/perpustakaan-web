@@ -19,10 +19,10 @@ interface Buku {
 }
 
 interface Peminjaman {
-  jumlah_buku: number;
-  durasi: number;
-  status: 'Menunggu Konfirmasi' | 'Dikonfirmasi' | 'Menunggu Pengembalian';
+  status: 'Menunggu Konfirmasi' | 'Dikonfirmasi' | 'Terlambat';
   tanggal_pinjam: string;
+  tanggal_kembali: string;
+  denda: number;
   id: number;
   buku: {
     judul: string;
@@ -76,16 +76,8 @@ export default function Peminjaman() {
     setAlertDetail('');
   };
 
-  const handleKembalikan = async (peminjaman: Peminjaman) => {
-    await fetch('/api/peminjaman', {
-      method: 'PUT',
-      body: JSON.stringify({
-        id: peminjaman.id,
-        status: 'Menunggu Pengembalian',
-      }),
-    });
-
-    const result = await fetch('/api/pengembalian', {
+  const handleKembalikan = (peminjaman: Peminjaman) => {
+    fetch('/api/pengembalian', {
       method: 'POST',
       body: JSON.stringify({
         tanggal_pinjam: peminjaman.tanggal_pinjam,
@@ -93,15 +85,6 @@ export default function Peminjaman() {
         kode: peminjaman.buku.kode,
       }),
     });
-
-    if (result.ok) {
-      fetch(`/api/peminjaman?username=${username}`, { headers: { Authorization: cookie.getItem('token') } })
-        .then(response => response.json())
-        .then(result => {
-          const data: Peminjaman[] = result.data;
-          setDataPeminjaman(data.filter(d => d.status != 'Menunggu Pengembalian'));
-        });
-    }
   };
 
   useEffect(() => {
@@ -110,12 +93,9 @@ export default function Peminjaman() {
 
     setUsername(payload.username);
 
-    fetch(`/api/peminjaman?username=${username}`, { headers: { Authorization: cookie.getItem('token') } })
+    fetch(`/api/pengembalian?username=${username}`, { headers: { Authorization: cookie.getItem('token') } })
       .then(response => response.json())
-      .then(result => {
-        const data: Peminjaman[] = result.data;
-        setDataPeminjaman(data.filter(d => d.status != 'Menunggu Pengembalian'));
-      });
+      .then(result => setDataPeminjaman(result.data));
   }, [showModal]);
 
   useEffect(() => {
@@ -130,13 +110,13 @@ export default function Peminjaman() {
   return (
     <>
       <Head>
-        <title>Peminjaman</title>
+        <title>Pengembalian</title>
       </Head>
       <SideNav />
 
       <div className="absolute top-0 left-80 w-[80%] pt-10 pl-10">
         <div className="flex justify-between">
-          <h1 className="text-3xl text-gray-600">Peminjaman</h1>
+          <h1 className="text-3xl text-gray-600">Pengembalian</h1>
 
           <button
             className="rounded-md bg-pink-100 px-5 py-2 text-primary transition hover:bg-pink-200"
@@ -151,10 +131,12 @@ export default function Peminjaman() {
             dataPeminjaman.map(dp => (
               <div
                 key={dp.id}
-                className={`flex w-[200px] flex-col justify-between overflow-hidden rounded-lg border shadow${
+                className={`flex w-[200px] flex-col justify-between overflow-hidden rounded-lg border shadow ${
                   dp.status === 'Menunggu Konfirmasi'
                     ? 'border-gray-200 shadow-gray-200'
-                    : 'border-green-500 shadow-green-500'
+                    : dp.status == 'Dikonfirmasi'
+                    ? 'border-green-500 shadow-green-500'
+                    : 'border-red-500 shadow-red-500'
                 } shadow-sm`}
               >
                 <div>
@@ -163,39 +145,35 @@ export default function Peminjaman() {
                     src={dp.buku.cover ?? '/cover-placeholder.jpg'}
                     className="h-56 w-full object-cover"
                   />
-                  <div className="flex flex-col  p-4 sm:p-6">
+                  <div className="p-4 sm:p-6">
                     <h3 className="text-lg font-medium text-gray-900">{dp.buku.judul}</h3>
                     <p className="text-sm text-gray-500">Pinjam: {getFullDate(new Date(dp.tanggal_pinjam))}</p>
-
                     {dp.status === 'Dikonfirmasi' && (
-                      <p className="text-sm text-gray-500">
-                        Kembalikan sebelum:{' '}
-                        {getFullDate(
-                          new Date(
-                            `${`${dp.tanggal_pinjam.slice(0, -16)}${new Date(dp.tanggal_pinjam).getDate() + durasi}`}`
-                          )
-                        )}{' '}
-                      </p>
+                      <p className="text-sm text-gray-500">Kembali: {getFullDate(new Date(dp.tanggal_kembali))}</p>
                     )}
                   </div>
                 </div>
                 <div>
-                  {dp.status === 'Menunggu Konfirmasi' && <p className="px-5 py-1 text-center text-gray-700">{dp.status}</p>}
-                  {dp.status === 'Dikonfirmasi' && <p className="  px-5 py-1 text-center text-green-800">{dp.status}</p>}
+                  {dp.status === 'Menunggu Konfirmasi' && (
+                    <p className="px-5  py-1 text-center text-gray-700">{dp.status}</p>
+                  )}
+                  {dp.status === 'Dikonfirmasi' && <p className="px-5  py-1 text-center text-green-600">{dp.status}</p>}
+                  {dp.status === 'Terlambat' && <p className="px-5  py-1 text-center text-red-600">{dp.status}</p>}
                 </div>
 
-                {dp.status === 'Dikonfirmasi' && (
-                  <button
-                    className="mx-auto mt-5 mb-4 block rounded border border-blue-500 px-5 py-1 text-blue-900 transition hover:bg-blue-700 hover:text-white"
-                    onClick={() => confirm('Kembalikan Buku?') && handleKembalikan(dp)}
-                  >
-                    Kembalikan
-                  </button>
-                )}
+                <div>
+                  {dp.status === 'Dikonfirmasi' ? (
+                    <p className="bg-green-100 text-center ">Buku Telah dikembalikan</p>
+                  ) : dp.status === 'Menunggu Konfirmasi' ? (
+                    <p className="bg-gray-100 text-center ">Buku sedang verifikasi</p>
+                  ) : (
+                    <p className="bg-red-100 text-center ">Denda Rp. {dp.denda}</p>
+                  )}
+                </div>
               </div>
             ))
           ) : (
-            <h3>Tidak Ada Peminjaman</h3>
+            <h3>Tidak Ada Pengembalian</h3>
           )}
         </div>
       </div>

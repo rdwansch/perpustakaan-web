@@ -46,7 +46,10 @@ export default function peminjaman() {
     { name: 'Tanggal Pinjam', selector: row => `${getFullDate(new Date(row.tanggal_pinjam))}` },
     { name: 'Durasi', selector: row => `${row.durasi} Hari` },
     { name: 'Jumlah Buku', selector: row => `${row.jumlah_buku} buku` },
-    { name: 'Status', selector: row => row.status },
+    {
+      name: 'Status',
+      cell: row => <p className={`${row.status === 'Dikonfirmasi' ? 'bg-green-100' : 'bg-gray-100'}`}>{row.status}</p>,
+    },
     {
       name: 'Action',
       cell: row => (
